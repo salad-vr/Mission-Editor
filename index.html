@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Flow Mission Maker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<link rel="icon" type="image/png" href="flow-logo.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -266,7 +266,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 @media (max-width:900px) and (orientation:landscape){
   /* Topbar compact */
   .topbar{height:36px;padding:0 8px}
-  .topbar .brand svg{width:50px;height:18px}
+  .topbar .brand img{height:18px}
   .brand-sub{display:none}
   .phase-tab{height:24px;padding:0 8px;font-size:10px}
   .phase-add{width:24px;height:24px;font-size:12px}
@@ -362,15 +362,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 
 <div class="topbar">
   <a href="https://flowcqb.vercel.app/" target="_blank" class="brand" style="text-decoration:none">
-    <svg viewBox="0 0 200 70" width="72" height="25">
-      <defs>
-        <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0eccc"/><stop offset="100%" stop-color="#c8c080"/></linearGradient>
-        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2744"/><stop offset="100%" stop-color="#0e1a33"/></linearGradient>
-      </defs>
-      <text x="8" y="50" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="52" font-style="italic" fill="url(#sg)" stroke="#1a2744" stroke-width="4">Flow</text>
-      <text x="5" y="48" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="52" font-style="italic" fill="url(#fg)" stroke="#8a8560" stroke-width="0.5">Flow</text>
-      <path d="M30 56 Q80 62 160 52 Q170 50 155 54 Q100 66 25 60 Z" fill="url(#fg)" opacity="0.8"/>
-    </svg>
+    <img src="flow-logo.png" alt="Flow" style="height:24px;width:auto;border-radius:4px">
     <span class="brand-sub">Mission Maker</span>
   </a>
 
