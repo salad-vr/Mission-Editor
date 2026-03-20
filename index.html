@@ -9,19 +9,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
---bg:#0c0c10;--surface:#16161c;--surface2:#1e1e26;--surface3:#26262f;
---float:rgba(22,22,28,0.85);--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
---text:#d4d4dc;--text2:#8888a0;--text3:#555568;
---accent:#6C8EFF;--accent2:#5472d4;--accent-bg:rgba(108,142,255,0.12);
+--bg:#0c0c10;--surface:#152040;--surface2:#1b2a52;--surface3:#213264;
+--float:rgba(18,30,58,0.88);--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.13);
+--text:#d4d8e8;--text2:#8898be;--text3:#556080;
+--accent:#6C8EFF;--accent2:#5472d4;--accent-bg:rgba(108,142,255,0.15);
 --red:#f45;--green:#4ade80;--yellow:#facc15;--orange:#fb923c;--purple:#a78bfa;--cyan:#67e8f9;--pink:#f472b6;
 --radius:8px;
---flow-gold:#d4c98a;--flow-navy:#1a2744;
+--flow-gold:#d4c98a;--flow-navy:#152040;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13px}
 
 /* TOP BAR */
-.topbar{height:42px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;z-index:100;position:relative}
+.topbar{height:42px;background:var(--flow-navy);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 16px;z-index:100;position:relative}
 .topbar .brand{font-weight:700;font-size:13px;color:var(--flow-gold);letter-spacing:0.5px;margin-right:16px;display:flex;align-items:center;gap:8px;user-select:none}
 .topbar .brand .flow-logo{width:60px;height:24px;object-fit:contain;filter:brightness(1.1)}
 .brand-sub{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
@@ -41,7 +41,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 
 .top-actions{display:flex;align-items:center;gap:2px}
 .top-btn{height:28px;padding:0 10px;border:none;border-radius:6px;background:transparent;color:var(--text2);font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s}
-.top-btn:hover{background:var(--surface2);color:var(--text)}
+.top-btn:hover{background:rgba(255,255,255,0.08);color:var(--text)}
 .top-btn svg{width:14px;height:14px}
 .top-btn.share-btn{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(108,142,255,0.2)}
 .top-btn.share-btn:hover{background:rgba(108,142,255,0.2)}
@@ -70,7 +70,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 .opt-label{font-size:10px;color:var(--text3);font-weight:500}
 
 /* SIDEBAR */
-.sidebar{width:260px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:margin-right 0.3s cubic-bezier(0.4,0,0.2,1),opacity 0.2s;z-index:50;overflow-y:auto}
+.sidebar{width:260px;background:var(--flow-navy);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;flex-shrink:0;transition:margin-right 0.3s cubic-bezier(0.4,0,0.2,1),opacity 0.2s;z-index:50;overflow-y:auto}
 .sidebar.collapsed{margin-right:-260px;opacity:0;pointer-events:none}
 .sidebar-toggle{position:absolute;right:12px;top:12px;z-index:60;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--float);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
 .sidebar-toggle:hover{background:var(--surface2);color:var(--text)}
@@ -197,7 +197,18 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 
 <div class="topbar">
   <div class="brand">
-    <svg viewBox="0 0 120 40" width="60" height="24"><text x="0" y="30" font-family="Inter,sans-serif" font-weight="800" font-size="30" fill="#d4c98a" font-style="italic">Flow</text></svg>
+    <svg viewBox="0 0 200 70" width="72" height="25">
+      <defs>
+        <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0eccc"/><stop offset="100%" stop-color="#c8c080"/></linearGradient>
+        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2744"/><stop offset="100%" stop-color="#0e1a33"/></linearGradient>
+      </defs>
+      <!-- Shadow text -->
+      <text x="8" y="50" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="52" font-style="italic" fill="url(#sg)" stroke="#1a2744" stroke-width="4">Flow</text>
+      <!-- Main text -->
+      <text x="5" y="48" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="52" font-style="italic" fill="url(#fg)" stroke="#8a8560" stroke-width="0.5">Flow</text>
+      <!-- Swoosh underline -->
+      <path d="M30 56 Q80 62 160 52 Q170 50 155 54 Q100 66 25 60 Z" fill="url(#fg)" opacity="0.8"/>
+    </svg>
     <span class="brand-sub">Mission Maker</span>
   </div>
 
@@ -279,7 +290,7 @@ const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),wrap=
 let W=0,H=0,cam={x:0,y:0,zoom:1};
 let floors=[{id:'f1',name:'Floor 1'}],activeFloor='f1';
 let layers=[],activeLayerId=null,objects=[];
-let phases=[{id:'p1',name:'Infil',color:'#4ade80',notes:''},{id:'p2',name:'Execution',color:'#6C8EFF',notes:''},{id:'p3',name:'Exfil',color:'#fb923c',notes:''}];
+let phases=[{id:'p1',name:'Phase I',color:'#4ade80',notes:''},{id:'p2',name:'Phase II',color:'#6C8EFF',notes:''},{id:'p3',name:'Phase III',color:'#fb923c',notes:''}];
 let activePhase='p1';
 let currentTool='select',drawColor='#6C8EFF',strokeSize=3,lineStyle='solid';
 let undoStack=[],redoStack=[],dragState=null,drawing=null;
