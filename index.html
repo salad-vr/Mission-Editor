@@ -440,7 +440,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 
 <div class="ctx-menu" id="ctx-menu"></div>
 <div class="toast" id="toast"></div>
-<div class="modal-bg" id="share-modal"><div class="modal"><h3>Share Mission Plan</h3><p>Copy this link to share your full mission plan including map images, annotations, phases and notes. Recipients will see everything exactly as you have it.</p><input class="share-url" id="share-url" readonly><div class="modal-actions"><button class="mbtn mbtn-cancel" onclick="document.getElementById('share-modal').classList.remove('show')">Close</button><button class="mbtn mbtn-primary" id="copy-share">Copy Link</button></div></div></div>
+<div class="modal-bg" id="share-modal"><div class="modal"><h3>Share Mission Plan</h3><p>Your plan has been uploaded. Copy this short link to share your full mission plan including map images, annotations, phases and notes.</p><input class="share-url" id="share-url" readonly><div class="modal-actions"><button class="mbtn mbtn-cancel" onclick="document.getElementById('share-modal').classList.remove('show')">Close</button><button class="mbtn mbtn-primary" id="copy-share">Copy Link</button></div></div></div>
 <!-- TAVR Gallery Modal -->
 <div class="tavr-bg" id="tavr-modal">
   <div class="tavr-modal">
@@ -475,10 +475,11 @@ let objIdCounter=1,layerIdCounter=1,floorIdCounter=2,phaseIdCounter=4;
 const TEAM_COLORS=['#6C8EFF','#f45','#4ade80','#facc15','#a78bfa','#67e8f9','#fb923c','#f472b6','#e2e2e8'];
 const PHASE_COLORS=['#4ade80','#6C8EFF','#fb923c','#f45','#a78bfa','#facc15','#67e8f9','#f472b6'];
 
-function init(){
-  checkShareURL();
+async function init(){
   resize();window.addEventListener('resize',resize);
   setupCanvas();setupToolbar();setupSidebar();setupDragDrop();setupPaste();setupKeyboard();
+  renderPhases();renderLayers();renderFloors();updatePhaseNotes();render();
+  await checkShareURL();
   renderPhases();renderLayers();renderFloors();updatePhaseNotes();render();
 }
 
@@ -854,56 +855,87 @@ function loadTAVRMap(idx){
   img.src=m.file;
 }
 
-// SHARE (includes images)
-function sharePlan(){
+// SHARE (uploads to jsonblob for short links)
+async function sharePlan(){
   savePhaseNotes();
-  toast('Generating share link...');
+  toast('Uploading plan...');
   // Build share data with images encoded
   const layerData=[];
-  let imgPromises=[];
   for(const l of layers){
     const o={...l};
     if(l.type==='image'&&l.image){
       const c=document.createElement('canvas');
-      // Downscale large images for URL sharing (max 800px wide)
-      const maxW=800;
+      const maxW=1200;
       let w=l.image.naturalWidth||l.image.width, h=l.image.naturalHeight||l.image.height;
       if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}
       c.width=w;c.height=h;
       c.getContext('2d').drawImage(l.image,0,0,w,h);
-      o.imageData=c.toDataURL('image/jpeg',0.6);
+      o.imageData=c.toDataURL('image/jpeg',0.65);
       delete o.image;
     }
     layerData.push(o);
   }
   const data={v:3,f:floors,af:activeFloor,ph:phases,ap:activePhase,o:objects,c:cam,l:layerData};
   try{
-    const json=JSON.stringify(data);
-    const compressed=btoa(unescape(encodeURIComponent(json)));
-    if(compressed.length>1800000){
-      toast('Plan too large for URL sharing. Try with smaller/fewer images, or use Save.');
-      return;
+    const resp=await fetch('https://jsonblob.com/api/jsonBlob',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(data)
+    });
+    if(!resp.ok) throw new Error('Upload failed: '+resp.status);
+    const blobUrl=resp.headers.get('Location')||resp.headers.get('location');
+    // Extract blob ID from URL like https://jsonblob.com/api/jsonBlob/1234567890
+    let blobId;
+    if(blobUrl) blobId=blobUrl.split('/').pop();
+    else{
+      // Some browsers don't expose Location, try to get from response
+      const rData=await resp.json();
+      // Try to extract from the blob URL if returned
+      blobId=rData?.id||null;
     }
-    const url=location.origin+location.pathname+'#plan='+compressed;
+    if(!blobId){
+      // Fallback: try parsing the response URL
+      const loc=resp.url;
+      blobId=loc.split('/').pop();
+    }
+    if(!blobId) throw new Error('Could not get share ID');
+    const url=location.origin+location.pathname+'#s='+blobId;
     document.getElementById('share-url').value=url;
     document.getElementById('share-modal').classList.add('show');
-  }catch(e){toast('Failed to generate share link. Try Save instead.')}
+    toast('Share link ready!');
+  }catch(e){
+    console.error('Share failed:',e);
+    toast('Share failed. Try Save to file instead.');
+  }
 }
 
-function checkShareURL(){
+async function checkShareURL(){
   const hash=location.hash;
-  if(!hash.startsWith('#plan='))return;
+  // Support both old #plan= format and new #s= short format
+  let data=null;
+  if(hash.startsWith('#s=')){
+    const blobId=hash.slice(3);
+    toast('Loading shared plan...');
+    try{
+      const resp=await fetch('https://jsonblob.com/api/jsonBlob/'+blobId);
+      if(!resp.ok) throw new Error('Failed to load: '+resp.status);
+      data=await resp.json();
+    }catch(e){console.error('Failed to load shared plan:',e);toast('Failed to load shared plan');return}
+  } else if(hash.startsWith('#plan=')){
+    try{
+      const compressed=hash.slice(6);
+      const json=decodeURIComponent(escape(atob(compressed)));
+      data=JSON.parse(json);
+    }catch(e){console.error('Failed to load shared plan:',e);return}
+  } else return;
+
+  if(!data) return;
   try{
-    const compressed=hash.slice(6);
-    const json=decodeURIComponent(escape(atob(compressed)));
-    const data=JSON.parse(json);
     floors=data.f||[{id:'f1',name:'Floor 1'}];activeFloor=data.af||'f1';
     phases=data.ph||phases;activePhase=data.ap||phases[0]?.id||'p1';
     objects=data.o||[];cam=data.c||{x:0,y:0,zoom:1};
-    // Load layers with images
     if(data.l){
-      layers=[];
-      let ps=[];
+      layers=[];let ps=[];
       for(const l of data.l){
         if(l.imageData){
           const ly={...l,image:null};layers.push(ly);
