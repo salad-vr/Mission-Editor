@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Flow Mission Maker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
 <style>
@@ -235,9 +235,128 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.14)}
+
+/* ===== PORTRAIT ORIENTATION OVERLAY ===== */
+.portrait-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,14,0.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  color:var(--text);text-align:center;padding:40px;
+}
+.portrait-overlay .rotate-icon{
+  width:64px;height:64px;animation:rotatePhone 2s ease-in-out infinite;
+}
+@keyframes rotatePhone{
+  0%,100%{transform:rotate(0deg)}
+  25%{transform:rotate(-90deg)}
+  50%,75%{transform:rotate(-90deg)}
+}
+.portrait-overlay h2{font-size:18px;font-weight:700;color:var(--flow-gold)}
+.portrait-overlay p{font-size:13px;color:var(--text2);max-width:260px;line-height:1.6}
+
+@media (orientation:portrait) and (max-width:900px){
+  .portrait-overlay{display:flex !important}
+}
+@media (orientation:landscape),(min-width:901px){
+  .portrait-overlay{display:none !important}
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width:900px) and (orientation:landscape){
+  /* Topbar compact */
+  .topbar{height:36px;padding:0 8px}
+  .topbar .brand svg{width:50px;height:18px}
+  .brand-sub{display:none}
+  .phase-tab{height:24px;padding:0 8px;font-size:10px}
+  .phase-add{width:24px;height:24px;font-size:12px}
+  .top-btn{height:24px;padding:0 6px;font-size:10px}
+  .top-btn svg{width:12px;height:12px}
+  .top-sep{height:12px;margin:0 3px}
+  .main{height:calc(100vh - 36px)}
+
+  /* Hide text labels on topbar buttons */
+  .top-btn{font-size:0}
+  .top-btn svg{width:14px;height:14px}
+
+  /* Tool palette: horizontal bottom bar */
+  .tool-palette{
+    left:50%;top:auto;bottom:8px;transform:translateX(-50%);
+    flex-direction:row;padding:4px;border-radius:10px;gap:1px;
+    max-width:calc(100vw - 24px);overflow-x:auto;
+  }
+  .tool-palette .tp-sep{width:1px;height:24px;margin:2px 1px;flex-shrink:0}
+  .tp-btn{width:32px;height:32px;flex-shrink:0}
+  .tp-btn svg{width:16px;height:16px}
+  .tp-btn::after{display:none}
+
+  /* Options bar */
+  .options-bar{top:6px;padding:3px 8px;gap:5px}
+  .opt-label{display:none}
+  .opt-color{width:20px;height:20px}
+  .opt-select{height:22px;font-size:10px;padding:0 4px}
+
+  /* Zoom bar */
+  .zoom-bar{bottom:52px;right:8px}
+  .zoom-bar button{width:24px;height:24px}
+  .zoom-bar span{font-size:10px;min-width:32px}
+
+  /* Coords */
+  .coords{bottom:52px;left:8px;padding:3px 8px;font-size:9px}
+
+  /* Sidebar */
+  .sidebar{width:200px}
+  .sidebar.collapsed{margin-right:-200px}
+  .sidebar-toggle{top:6px;right:8px;width:30px;height:30px}
+  .sidebar-toggle svg{width:14px;height:14px}
+
+  /* Props float */
+  .props-float{width:180px;right:8px;bottom:52px;padding:10px;max-height:200px}
+  .props-float.sidebar-open{right:214px}
+
+  /* Empty state */
+  .empty-state h2{font-size:14px}
+  .empty-state p{font-size:11px;max-width:240px}
+  .empty-state .keys{gap:4px}
+  .empty-state .key{font-size:9px;padding:2px 6px}
+
+  /* TAVR sticker */
+  .tavr-sticker-tip{font-size:9px;padding:6px 22px 6px 10px}
+
+  /* Modals */
+  .modal{padding:16px;width:95vw}
+  .tavr-modal{width:95vw;max-height:90vh}
+  .tavr-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .tavr-card img{height:90px}
+  .tavr-header{padding:12px 16px}
+  .tavr-body{padding:12px 16px}
+}
+
+/* Extra small landscape (phones) */
+@media (max-height:420px) and (orientation:landscape){
+  .topbar{height:32px;padding:0 6px}
+  .main{height:calc(100vh - 32px)}
+  .tool-palette{bottom:4px;padding:3px}
+  .tp-btn{width:28px;height:28px}
+  .tp-btn svg{width:14px;height:14px}
+  .zoom-bar{bottom:44px}
+  .coords{bottom:44px}
+  .props-float{bottom:44px;max-height:160px}
+}
 </style>
 </head>
 <body>
+
+<!-- Portrait orientation overlay -->
+<div class="portrait-overlay" id="portrait-overlay">
+  <svg class="rotate-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+    <rect x="14" y="8" width="36" height="48" rx="4" stroke-width="2.5"/>
+    <circle cx="32" cy="50" r="2" fill="currentColor"/>
+    <path d="M48 32l6-6m0 0l6 6m-6-6v14" stroke="var(--flow-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h2>Rotate Your Device</h2>
+  <p>Flow Mission Maker works best in landscape mode. Please turn your phone sideways.</p>
+</div>
 
 <div class="view-banner" id="view-banner">Viewing shared mission plan <button onclick="exitViewMode()">Edit a copy</button></div>
 
@@ -488,7 +607,59 @@ function hitObj(obj,wx,wy){const t=12/cam.zoom;switch(obj.type){case 'marker':ca
 function dts(px,py,x1,y1,x2,y2){const dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;if(!l2)return Math.hypot(px-x1,py-y1);let t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l2));return Math.hypot(px-(x1+t*dx),py-(y1+t*dy))}
 
 // CANVAS EVENTS
-function setupCanvas(){canvas.addEventListener('wheel',onWheel,{passive:false});canvas.addEventListener('mousedown',onMD);canvas.addEventListener('mousemove',onMM);canvas.addEventListener('mouseup',onMU);canvas.addEventListener('dblclick',onDbl);canvas.addEventListener('contextmenu',onCtxE)}
+function setupCanvas(){
+  canvas.addEventListener('wheel',onWheel,{passive:false});
+  canvas.addEventListener('mousedown',onMD);canvas.addEventListener('mousemove',onMM);
+  canvas.addEventListener('mouseup',onMU);canvas.addEventListener('dblclick',onDbl);
+  canvas.addEventListener('contextmenu',onCtxE);
+  // Touch events
+  let touchState={};
+  canvas.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    const ts=e.touches;
+    if(ts.length===2){
+      // Two-finger: start pan/pinch
+      const dx=ts[0].clientX-ts[1].clientX,dy=ts[0].clientY-ts[1].clientY;
+      touchState={type:'pinch',dist:Math.hypot(dx,dy),mid:{x:(ts[0].clientX+ts[1].clientX)/2,y:(ts[0].clientY+ts[1].clientY)/2},cx:cam.x,cy:cam.y,zoom:cam.zoom};
+    } else if(ts.length===1){
+      const r=wrap.getBoundingClientRect(),sx=ts[0].clientX-r.left,sy=ts[0].clientY-r.top;
+      touchState={type:'single',sx,sy,startTime:Date.now(),moved:false};
+      // Simulate mousedown for tool usage
+      const me=new MouseEvent('mousedown',{clientX:ts[0].clientX,clientY:ts[0].clientY,button:0});
+      canvas.dispatchEvent(me);
+    }
+  },{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const ts=e.touches;
+    if(ts.length===2&&touchState.type==='pinch'){
+      const dx=ts[0].clientX-ts[1].clientX,dy=ts[0].clientY-ts[1].clientY;
+      const newDist=Math.hypot(dx,dy);
+      const scale=newDist/touchState.dist;
+      const newMid={x:(ts[0].clientX+ts[1].clientX)/2,y:(ts[0].clientY+ts[1].clientY)/2};
+      const r=wrap.getBoundingClientRect();
+      const mx=newMid.x-r.left,my=newMid.y-r.top;
+      const omx=touchState.mid.x-r.left,omy=touchState.mid.y-r.top;
+      cam.zoom=Math.max(0.05,Math.min(20,touchState.zoom*scale));
+      cam.x=mx-(omx-touchState.cx)*(cam.zoom/touchState.zoom)+(newMid.x-touchState.mid.x);
+      cam.y=my-(omy-touchState.cy)*(cam.zoom/touchState.zoom)+(newMid.y-touchState.mid.y);
+      document.getElementById('zoom-level').textContent=Math.round(cam.zoom*100)+'%';
+      render();
+    } else if(ts.length===1){
+      if(touchState.type==='single') touchState.moved=true;
+      const me=new MouseEvent('mousemove',{clientX:ts[0].clientX,clientY:ts[0].clientY,button:0});
+      canvas.dispatchEvent(me);
+    }
+  },{passive:false});
+  canvas.addEventListener('touchend',e=>{
+    e.preventDefault();
+    if(touchState.type==='single'){
+      const me=new MouseEvent('mouseup',{clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY,button:0});
+      canvas.dispatchEvent(me);
+    }
+    touchState={};
+  },{passive:false});
+}
 function onWheel(e){e.preventDefault();const r=wrap.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,oz=cam.zoom,d=e.deltaY>0?.9:1.1;cam.zoom=Math.max(.05,Math.min(20,cam.zoom*d));cam.x=mx-(mx-cam.x)*(cam.zoom/oz);cam.y=my-(my-cam.y)*(cam.zoom/oz);document.getElementById('zoom-level').textContent=Math.round(cam.zoom*100)+'%';render()}
 
 function onMD(e){
