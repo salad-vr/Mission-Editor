@@ -235,9 +235,10 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
   font-size:10px;font-weight:700;letter-spacing:0.3px;
   padding:6px 24px 6px 10px;border-radius:8px;white-space:nowrap;
   box-shadow:0 4px 16px rgba(229,62,62,0.4);
-  z-index:199;animation:stickerSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  display:flex;align-items:center;gap:4px;pointer-events:auto;
+  z-index:150;animation:stickerSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  display:flex;align-items:center;gap:4px;
 }
+.games-dropdown.show~.games-sticker{display:none}
 .games-sticker::before{
   content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);
   border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #e53e3e;
@@ -882,7 +883,8 @@ const GAME_MAPS = {
 
 let activeGameId=null;
 
-function toggleGamesDropdown(){
+function toggleGamesDropdown(e){
+  if(e)e.stopPropagation();
   const dd=document.getElementById('games-dropdown');
   const sticker=document.getElementById('games-sticker');
   if(sticker)sticker.remove();
@@ -891,14 +893,21 @@ function toggleGamesDropdown(){
   const gameKeys=Object.keys(GAME_MAPS);
   dd.innerHTML=gameKeys.map(k=>{
     const g=GAME_MAPS[k];
-    return `<div class="game-item" onclick="openGameMaps('${k}')"><div class="game-icon">${g.icon}</div><div class="game-info"><div class="game-name">${g.name}</div><div class="game-count">${g.maps.length} maps</div></div><span class="game-arrow">&rsaquo;</span></div>`;
+    return `<div class="game-item" onclick="event.stopPropagation();openGameMaps('${k}')"><div class="game-icon">${g.icon}</div><div class="game-info"><div class="game-name">${g.name}</div><div class="game-count">${g.maps.length} map${g.maps.length!==1?'s':''}</div></div><span class="game-arrow">&rsaquo;</span></div>`;
   }).join('');
   if(gameKeys.length===0) dd.innerHTML='<div style="padding:12px;text-align:center;color:var(--text3);font-size:11px">No games available</div>';
   dd.classList.add('show');
-  // Close on outside click
-  setTimeout(()=>document.addEventListener('click',function closeDD(e){
-    if(!document.getElementById('games-wrap').contains(e.target)){dd.classList.remove('show');document.removeEventListener('click',closeDD)}
-  }),10);
+  // Close on outside click (delay to avoid catching this click)
+  requestAnimationFrame(()=>{
+    const closeDD=function(ev){
+      const wrap=document.getElementById('games-wrap');
+      if(!wrap||!wrap.contains(ev.target)){
+        dd.classList.remove('show');
+        document.removeEventListener('click',closeDD);
+      }
+    };
+    document.addEventListener('click',closeDD);
+  });
 }
 
 function openGameMaps(gameId){
