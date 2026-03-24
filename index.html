@@ -202,13 +202,10 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
 /* Games dropdown - fixed position like context menu */
 .games-wrap{position:relative;display:inline-flex}
 .games-dropdown{
-  position:fixed;
-  background:var(--float);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
-  border:1px solid var(--border2);border-radius:10px;padding:4px;min-width:220px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.4);z-index:500;display:none;
+  position:fixed;display:none;
+  background:var(--flow-navy);border:1px solid var(--border2);border-radius:10px;padding:4px;min-width:220px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
 }
-.games-dropdown.show{display:block;animation:dropIn 0.2s ease-out}
-@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .game-item{
   padding:10px 12px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:10px;
   transition:background 0.12s;color:var(--text);font-size:12px;font-weight:500;
@@ -401,7 +398,7 @@ font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:cen
     <button class="top-btn" id="btn-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
     <div class="top-sep"></div>
     <span class="games-wrap" id="games-wrap">
-      <button class="top-btn" id="btn-games" style="background:rgba(212,201,138,0.12);color:var(--flow-gold);border:1px solid rgba(212,201,138,0.25);font-weight:700;letter-spacing:1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 12h4m-2-2v4m6-1h.01M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>Games</button>
+      <button class="top-btn" id="btn-games" onclick="toggleGamesDropdown(event)" style="background:rgba(212,201,138,0.12);color:var(--flow-gold);border:1px solid rgba(212,201,138,0.25);font-weight:700;letter-spacing:1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 12h4m-2-2v4m6-1h.01M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>Games</button>
       <div class="games-sticker" id="games-sticker">Tactical Assault VR maps inside!<button class="sticker-x" onclick="event.stopPropagation();document.getElementById('games-sticker').remove()">&times;</button></div>
     </span>
     <div class="top-sep"></div>
@@ -777,7 +774,7 @@ function setupToolbar(){
   document.getElementById('zoom-out').addEventListener('click',()=>{cam.zoom=Math.max(.05,cam.zoom/1.2);document.getElementById('zoom-level').textContent=Math.round(cam.zoom*100)+'%';render()});
   document.getElementById('sidebar-toggle').addEventListener('click',()=>{sidebarOpen=!sidebarOpen;document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);document.getElementById('zoom-bar').classList.toggle('sidebar-open',sidebarOpen);document.getElementById('props-float').classList.toggle('sidebar-open',sidebarOpen);setTimeout(resize,300)});
   document.getElementById('copy-share').addEventListener('click',()=>{const el=document.getElementById('share-url');el.select();navigator.clipboard.writeText(el.value);toast('Link copied!')});
-  document.getElementById('btn-games').addEventListener('click',toggleGamesDropdown);
+  // Games button uses inline onclick
 }
 
 function setupSidebar(){
@@ -879,40 +876,48 @@ const GAME_MAPS = {
 let activeGameId=null;
 
 function toggleGamesDropdown(e){
-  if(e){e.stopPropagation();e.preventDefault();}
-  const dd=document.getElementById('games-dropdown');
-  const sticker=document.getElementById('games-sticker');
-  if(sticker)sticker.remove();
-  if(dd.classList.contains('show')){dd.classList.remove('show');return}
-  // Position dropdown below button
-  const btn=document.getElementById('btn-games');
-  const rect=btn.getBoundingClientRect();
-  dd.style.top=(rect.bottom+4)+'px';
-  dd.style.left=(rect.left+rect.width/2-110)+'px'; // 110 = half of min-width 220
-  // Build dropdown items
-  const gameKeys=Object.keys(GAME_MAPS);
-  dd.innerHTML=gameKeys.map(k=>{
-    const g=GAME_MAPS[k];
-    return `<div class="game-item" onclick="event.stopPropagation();openGameMaps('${k}')"><div class="game-icon">${g.icon}</div><div class="game-info"><div class="game-name">${g.name}</div><div class="game-count">${g.maps.length} map${g.maps.length!==1?'s':''}</div></div><span class="game-arrow">&rsaquo;</span></div>`;
-  }).join('');
-  if(gameKeys.length===0) dd.innerHTML='<div style="padding:12px;text-align:center;color:var(--text3);font-size:11px">No games available</div>';
-  dd.classList.add('show');
-  // Close on any outside click
-  setTimeout(()=>{
-    function closeDD(ev){
-      if(!dd.contains(ev.target)&&ev.target!==btn&&!btn.contains(ev.target)){
-        dd.classList.remove('show');
-        document.removeEventListener('mousedown',closeDD);
-      }
+  try{
+    if(e){e.stopPropagation();e.preventDefault();}
+    var dd=document.getElementById('games-dropdown');
+    var sticker=document.getElementById('games-sticker');
+    if(sticker)sticker.remove();
+    // Toggle off
+    if(dd.style.display==='block'){dd.style.display='none';return}
+    // Position below button
+    var btn=document.getElementById('btn-games');
+    var rect=btn.getBoundingClientRect();
+    var left=Math.max(8,rect.left-60);
+    dd.style.position='fixed';
+    dd.style.top=(rect.bottom+6)+'px';
+    dd.style.left=left+'px';
+    dd.style.zIndex='9000';
+    // Build items
+    var html='';
+    var keys=Object.keys(GAME_MAPS);
+    for(var i=0;i<keys.length;i++){
+      var k=keys[i],g=GAME_MAPS[k];
+      html+='<div class="game-item" onclick="openGameMaps(\''+k+'\')">'+
+        '<div class="game-icon">'+g.icon+'</div>'+
+        '<div class="game-info"><div class="game-name">'+g.name+'</div>'+
+        '<div class="game-count">'+g.maps.length+' map'+(g.maps.length!==1?'s':'')+'</div></div>'+
+        '<span class="game-arrow">&rsaquo;</span></div>';
     }
-    document.addEventListener('mousedown',closeDD);
-  },50);
+    dd.innerHTML=html;
+    dd.style.display='block';
+    // Close on click anywhere else
+    setTimeout(function(){
+      document.addEventListener('click',function _close(){
+        dd.style.display='none';
+        document.removeEventListener('click',_close);
+      },{once:true});
+    },100);
+  }catch(err){alert('Games error: '+err.message)}
 }
 
 function openGameMaps(gameId){
   const game=GAME_MAPS[gameId];if(!game)return;
   activeGameId=gameId;
-  document.getElementById('games-dropdown').classList.remove('show');
+  document.getElementById('games-dropdown').style.display='none';
   document.getElementById('gallery-title-text').textContent=game.name+' Maps';
   const grid=document.getElementById('tavr-grid');
   const empty=document.getElementById('tavr-empty');
