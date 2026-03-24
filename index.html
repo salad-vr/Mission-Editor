@@ -860,7 +860,7 @@ const GAME_MAPS = {
       { file: 'maps/Trident Lightning.jpg', name: 'Trident Lightning' },
       { file: 'maps/Void.png', name: 'Void' },
     ]
-  }
+  },
   ron: {
     name: 'Ready or Not',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
@@ -876,42 +876,35 @@ const GAME_MAPS = {
 let activeGameId=null;
 
 function toggleGamesDropdown(e){
-  try{
-    if(e){e.stopPropagation();e.preventDefault();}
-    var dd=document.getElementById('games-dropdown');
-    var sticker=document.getElementById('games-sticker');
-    if(sticker)sticker.remove();
-    // Toggle off
-    if(dd.style.display==='block'){dd.style.display='none';return}
-    // Position below button
-    var btn=document.getElementById('btn-games');
-    var rect=btn.getBoundingClientRect();
-    var left=Math.max(8,rect.left-60);
-    dd.style.position='fixed';
-    dd.style.top=(rect.bottom+6)+'px';
-    dd.style.left=left+'px';
-    dd.style.zIndex='9000';
-    // Build items
-    var html='';
-    var keys=Object.keys(GAME_MAPS);
-    for(var i=0;i<keys.length;i++){
-      var k=keys[i],g=GAME_MAPS[k];
-      html+='<div class="game-item" onclick="openGameMaps(\''+k+'\')">'+
-        '<div class="game-icon">'+g.icon+'</div>'+
-        '<div class="game-info"><div class="game-name">'+g.name+'</div>'+
-        '<div class="game-count">'+g.maps.length+' map'+(g.maps.length!==1?'s':'')+'</div></div>'+
-        '<span class="game-arrow">&rsaquo;</span></div>';
-    }
-    dd.innerHTML=html;
-    dd.style.display='block';
-    // Close on click anywhere else
-    setTimeout(function(){
-      document.addEventListener('click',function _close(){
-        dd.style.display='none';
-        document.removeEventListener('click',_close);
-      },{once:true});
-    },100);
-  }catch(err){alert('Games error: '+err.message)}
+  if(e){e.stopPropagation();e.preventDefault();}
+  var dd=document.getElementById('games-dropdown');
+  var sticker=document.getElementById('games-sticker');
+  if(sticker)sticker.remove();
+  if(dd.style.display==='block'){dd.style.display='none';return}
+  var btn=document.getElementById('btn-games');
+  var rect=btn.getBoundingClientRect();
+  dd.style.position='fixed';
+  dd.style.top=(rect.bottom+6)+'px';
+  dd.style.left=Math.max(8,rect.left-60)+'px';
+  dd.style.zIndex='9000';
+  var html='';
+  var keys=Object.keys(GAME_MAPS);
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],g=GAME_MAPS[k];
+    html+='<div class="game-item" onclick="openGameMaps(\''+k+'\')">'+
+      '<div class="game-icon">'+g.icon+'</div>'+
+      '<div class="game-info"><div class="game-name">'+g.name+'</div>'+
+      '<div class="game-count">'+g.maps.length+' map'+(g.maps.length!==1?'s':'')+'</div></div>'+
+      '<span class="game-arrow">&rsaquo;</span></div>';
+  }
+  dd.innerHTML=html;
+  dd.style.display='block';
+  setTimeout(function(){
+    document.addEventListener('click',function _close(){
+      dd.style.display='none';
+      document.removeEventListener('click',_close);
+    },{once:true});
+  },100);
 }
 
 function openGameMaps(gameId){
